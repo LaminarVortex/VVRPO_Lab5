@@ -1,1 +1,1 @@
-# VVRPO_Lab5
+# Miner game
