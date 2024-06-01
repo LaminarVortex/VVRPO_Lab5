@@ -144,7 +144,9 @@ namespace Miner.Controllers
                 for (int j = 0; j < mapSize; j++)
                 {
                     if (i == iBomb && j == jBomb)
+                    {
                         continue;
+                    }
                     if (map[i, j] == -1)
                     {
                         buttons[i, j].Image = FindImage(3, 2);
@@ -189,7 +191,8 @@ namespace Miner.Controllers
             {
                 int posI = r.Next(0, mapSize - 1);
                 int posJ = r.Next(0, mapSize - 1);
-
+                //цикл повторной расстановки бомбы, если клетка с такими координатами уже заполнена
+                //дополнительное условие включает в расстановку координаты первой клетки
                 while (map[posI, posJ] == -1 || (Math.Abs(posI - firstCoord.Y) <= 1 && Math.Abs(posJ - firstCoord.X) <= 1))
                 {
                     posI = r.Next(0, mapSize - 1);
@@ -211,8 +214,10 @@ namespace Miner.Controllers
                         {
                             for (int l = j - 1; l < j + 2; l++)
                             {
-                                if (!IsInBorder(k, l) || map[k, l] == -1)
+                                if (!IsOutOfPlane(k, l) || map[k, l] == -1)
+                                {
                                     continue;
+                                }
                                 map[k, l] = map[k, l] + 1;
                             }
                         }
@@ -258,6 +263,8 @@ namespace Miner.Controllers
                 case 0:
                     buttons[i, j].Image = FindImage(0, 0);
                     break;
+                default:
+                    break;
             }
         }
 
@@ -266,25 +273,35 @@ namespace Miner.Controllers
             OpenCell(i, j);
 
             if (map[i, j] > 0)
+            {
                 return;
+            }
 
             for (int k = i - 1; k < i + 2; k++)
             {
                 for (int l = j - 1; l < j + 2; l++)
                 {
-                    if (!IsInBorder(k, l))
+                    if (!IsOutOfPlane(k, l))
+                    {
                         continue;
+                    }
                     if (!buttons[k, l].Enabled)
+                    {
                         continue;
+                    }
                     if (map[k, l] == 0)
+                    {
                         OpenCells(k, l);
+                    }
                     else if (map[k, l] > 0)
-                        OpenCell(k, l);
+                    {
+                        OpenCells(k, l);
+                    }
                 }
             }
         }
 
-        private static bool IsInBorder(int i, int j)
+        private static bool IsOutOfPlane(int i, int j)
         {
             if (i < 0 || j < 0 || j > mapSize - 1 || i > mapSize - 1)
             {
@@ -294,81 +311,3 @@ namespace Miner.Controllers
         }
     }
 }
-
-
-
-
-//using Microsoft.VisualBasic.ApplicationServices;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Security.Cryptography;
-//using System.Text;
-//using System.Threading.Tasks;
-
-//namespace VVRPO_Lab5.Controllers
-//{
-
-
-
-//    public static class MapController
-//    {
-//        public const int mapSize = 8;
-//        public const int cellSize = 70;
-
-//        public static int[,] map = new int[mapSize, mapSize];
-//        public static Button[,] buttons = new Button[mapSize, mapSize];
-
-//        public static Image spriteSet;
-
-//        private static void ConfigureMapSize(Form current)
-//        {
-//            current.Width = mapSize * cellSize + 20;
-//            current.Height = mapSize * cellSize + 50;
-//        }
-//        public static void Init(Form current)
-//        {
-//            spriteSet = new Bitmap(/*Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName.ToString(), "Sprites\\tiles.png")*/);
-//            spriteSet = new Bitmap()
-//            ConfigureMapSize(current);
-//            InitMap();
-//            InitButtons(current);
-//        }
-
-//        private static void InitMap()
-//        {
-//            for (int i = 0; i < mapSize; i++)
-//            {
-//                for (int j = 0; j < mapSize; j++)
-//                {
-//                    map[i, j] = 0;
-//                }
-//            }
-//        }
-
-//        private static void InitButtons(Form current)
-//        {
-//            for (int i = 0; i < mapSize; i++)
-//            {
-//                for (int j = 0; j < mapSize; j++)
-//                {
-//                    Button button = new Button();
-//                    button.Location = new Point(i * cellSize, j * cellSize);
-//                    button.Size = new Size(cellSize, cellSize);
-//                    button.Image = FindImage(0, 2);
-//                    current.Controls.Add(button);
-//                    buttons[i, j] = button;
-//                }
-//            }
-//        }
-
-//        public static Image FindImage(int xPos, int yPos)
-//        {
-//            Image image = new Bitmap(cellSize, cellSize);
-//            Graphics graphics = Graphics.FromImage(image);
-//            graphics.DrawImage(spriteSet, new Rectangle(new Point(0, 0), new Size(cellSize, cellSize)), 0 + 32 * xPos, 0 + 32 * yPos, 33, 33, GraphicsUnit.Pixel);
-
-//            return image;
-//        }
-//    }
-//}
